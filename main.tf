@@ -1,38 +1,36 @@
 # Create a resource group
 resource "azurerm_resource_group" "testrg" {
   name     = "rgsp"
-  location = "West us"
+  location = "West US"
 }
 
 # Create a virtual network within the resource group
 resource "azurerm_virtual_network" "vnsp" {
   name                = "vnsp"
-  resource_group_name = "rgsp"
-  location            = "west us"
+  resource_group_name = azurerm_resource_group.testrg.name
+  location            = azurerm_resource_group.testrg.location
   address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_subnet" "snsp" {
   name                 = "snsp"
-  resource_group_name  = "rgsp"
-  virtual_network_name = "vnsp"
+  resource_group_name  = azurerm_resource_group.testrg.name
+  virtual_network_name = azurerm_virtual_network.vnsp.name
   address_prefixes     = ["10.0.1.0/24"]
-
 }
 
 resource "azurerm_public_ip" "pip" {
   name                = "demo-pip"
-  location            = "West US"
-  resource_group_name = "rgsp"
-
-  allocation_method = "Static"
-  sku               = "Standard"
+  resource_group_name = azurerm_resource_group.testrg.name
+  location            = azurerm_resource_group.testrg.location
+  allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
 resource "azurerm_network_interface" "nic" {
   name                = "demo-nic"
-  location            = "West Us"
-  resource_group_name = "rgsp"
+  resource_group_name = azurerm_resource_group.testrg.name
+  location            = azurerm_resource_group.testrg.location
 
   ip_configuration {
     name                          = "internal"
@@ -42,11 +40,10 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
-
 resource "azurerm_linux_virtual_machine" "vmsp" {
   name                = "vmsp"
-  resource_group_name = "rgsp"
-  location            = "East US"
+  resource_group_name = azurerm_resource_group.testrg.name
+  location            = azurerm_resource_group.testrg.location # <-- FIXED: Changed from "East US" to dynamic West US
   size                = "Standard_B1ms"
 
   admin_username = "azureuser"
