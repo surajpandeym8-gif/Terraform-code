@@ -1,6 +1,6 @@
 # Create a resource group
 resource "azurerm_resource_group" "testrg" {
-  name     = "rgsp"
+  name     = "rgsp1"
   location = "West US"
 }
 
